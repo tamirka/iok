@@ -3,50 +3,6 @@ import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
 
 export const toolsData = [
   {
-    id: 1,
-    name: "CineGen AI",
-    slug: "cinegen-ai",
-    category: "video",
-    categoryLabel: "Video AI",
-    categoryColor: "teal",
-    emoji: "🎬",
-    short: "Cinematic AI video prompt generator",
-    description: "Generate precise, scene-by-scene AI video prompts for tools like Seedance, Kling, Runway, and Veo. Built on Claude API with multi-generator interface and JSON export.",
-    features: [
-      "Multi-generator: scene, character, camera movement",
-      "Claude API prompt crafting engine",
-      "Export as JSON or plain paragraph",
-      "Supports Seedance 2.0, Kling, Veo, Runway",
-      "Reusable prompt library"
-    ],
-    stack: ["Claude API", "HTML/JS", "Anthropic SDK"],
-    link: "https://example.com/cinegen",
-    image: null,
-    comingSoon: false
-  },
-  {
-    id: 2,
-    name: "CCTV Prompt Generator",
-    slug: "cctv-prompt-generator",
-    category: "prompt",
-    categoryLabel: "Prompt Tool",
-    categoryColor: "purple",
-    emoji: "📹",
-    short: "Turn scene descriptions into CCTV-style AI video prompts",
-    description: "Describe any scene and instantly get a detailed surveillance-camera style prompt optimized for AI video generation. Used by filmmakers and security simulation studios.",
-    features: [
-      "Scene → CCTV prompt in one click",
-      "Camera angle, lens, grain, timestamp style controls",
-      "Supabase usage tracking",
-      "Mobile-ready (Android via Capacitor)",
-      "OpenAI server-side via Edge Functions"
-    ],
-    stack: ["OpenAI", "Supabase", "Capacitor", "HTML/JS"],
-    link: "https://cctvprompt.xyz",
-    image: null,
-    comingSoon: false
-  },
-  {
     id: 5,
     name: "Architecture Image Studio",
     slug: "architecture-image-studio",
@@ -133,42 +89,6 @@ export const toolsData = [
     iframeUrl: "https://education-image-studio-635102282857.us-west1.run.app",
     image: null,
     comingSoon: false
-  },
-  {
-    id: 3,
-    name: "Tool 3",
-    slug: "tool-3",
-    category: "automation",
-    categoryLabel: "Automation",
-    categoryColor: "pink",
-    emoji: "⚡",
-    short: "Your tool description goes here",
-    description: "Add your full tool description here. Explain what problem it solves, who it's for, and what makes it different.",
-    features: [
-      "Feature one",
-      "Feature two",
-      "Feature three"
-    ],
-    stack: ["Stack 1", "Stack 2"],
-    link: "https://example.com",
-    image: null,
-    comingSoon: true
-  },
-  {
-    id: 4,
-    name: "Tool 4",
-    slug: "tool-4",
-    category: "content",
-    categoryLabel: "Content",
-    categoryColor: "teal",
-    emoji: "✍️",
-    short: "Your tool description goes here",
-    description: "Add your full tool description here.",
-    features: ["Feature one", "Feature two"],
-    stack: ["Stack 1", "Stack 2"],
-    link: "https://example.com",
-    image: null,
-    comingSoon: true
   }
 ];
 
@@ -328,7 +248,6 @@ export function Tools() {
       <div className="filters-bar">
         <button className={`filter-btn ${activeFilter === 'all' ? 'active' : ''}`} onClick={() => setActiveFilter('all')}>All</button>
         <button className={`filter-btn ${activeFilter === 'image' ? 'active' : ''}`} onClick={() => setActiveFilter('image')}>Image AI</button>
-        <button className={`filter-btn ${activeFilter === 'video' ? 'active' : ''}`} onClick={() => setActiveFilter('video')}>Video AI</button>
         <button className={`filter-btn ${activeFilter === 'prompt' ? 'active' : ''}`} onClick={() => setActiveFilter('prompt')}>Prompt Tools</button>
         <button className={`filter-btn ${activeFilter === 'automation' ? 'active' : ''}`} onClick={() => setActiveFilter('automation')}>Automation</button>
         <button className={`filter-btn ${activeFilter === 'content' ? 'active' : ''}`} onClick={() => setActiveFilter('content')}>Content</button>
