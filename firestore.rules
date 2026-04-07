@@ -1,0 +1,83 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // ===============================================================
+    // Assumed Data Model
+    // ===============================================================
+    // Collection: templates
+    // Document ID: auto-generated
+    // Fields:
+    //   - title: string (required, max 100 chars)
+    //   - description: string (optional, max 1000 chars)
+    //   - imageUrl: string (required, max 1000000 chars for base64)
+    //   - category: string (optional, max 50 chars)
+    //   - authorUid: string (required, immutable)
+    //   - createdAt: timestamp (required, immutable)
+    // ===============================================================
+
+    function isAuthenticated() {
+       return request.auth != null;
+    }
+
+    function isDocOwner() {
+       return isAuthenticated() && request.auth.uid == resource.data.authorUid;
+    }
+
+    function uidNotModified() {
+       return !('authorUid' in request.resource.data) ||
+         request.resource.data.authorUid == resource.data.authorUid;
+    }
+
+    function hasRequiredFields(fields) {
+       return request.resource.data.keys().hasAll(fields);
+    }
+
+    function validStringLength(field, minLen, maxLen) {
+       return request.resource.data[field] is string &&
+         request.resource.data[field].size() >= minLen &&
+         request.resource.data[field].size() <= maxLen;
+    }
+
+    function isValidOptionalString(field, minLen, maxLen) {
+      return !(field in request.resource.data) ||
+             (request.resource.data[field] is string &&
+              request.resource.data[field].size() >= minLen &&
+              request.resource.data[field].size() <= maxLen);
+    }
+
+    function isValidTemplate(data) {
+      return hasRequiredFields(['title', 'authorUid', 'createdAt']) &&
+             validStringLength('title', 1, 100) &&
+             isValidOptionalString('imageUrl', 0, 1048487) &&
+             isValidOptionalString('description', 0, 5000) &&
+             isValidOptionalString('category', 0, 50) &&
+             isValidOptionalString('categoryLabel', 0, 50) &&
+             isValidOptionalString('categoryColor', 0, 50) &&
+             isValidOptionalString('emoji', 0, 10) &&
+             isValidOptionalString('short', 0, 500) &&
+             isValidOptionalString('link', 0, 500) &&
+             isValidOptionalString('originalId', 0, 50) &&
+             data.authorUid is string &&
+             data.createdAt is timestamp;
+    }
+
+    match /templates/{templateId} {
+      // Anyone can read templates
+      allow read: if true;
+
+      // Only authenticated users can create templates, and they must be the author
+      allow create: if isAuthenticated() &&
+                    isValidTemplate(request.resource.data) &&
+                    request.resource.data.authorUid == request.auth.uid;
+
+      // Only the author can update or delete their templates
+      allow update: if isAuthenticated() &&
+                    isDocOwner() &&
+                    isValidTemplate(request.resource.data) &&
+                    uidNotModified() &&
+                    request.resource.data.createdAt == resource.data.createdAt;
+
+      allow delete: if isAuthenticated() && isDocOwner();
+    }
+  }
+}

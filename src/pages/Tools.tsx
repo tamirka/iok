@@ -1,0 +1,412 @@
+import { useState, useEffect } from 'react';
+import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
+
+export const toolsData = [
+  {
+    id: 1,
+    name: "CineGen AI",
+    slug: "cinegen-ai",
+    category: "video",
+    categoryLabel: "Video AI",
+    categoryColor: "teal",
+    emoji: "🎬",
+    short: "Cinematic AI video prompt generator",
+    description: "Generate precise, scene-by-scene AI video prompts for tools like Seedance, Kling, Runway, and Veo. Built on Claude API with multi-generator interface and JSON export.",
+    features: [
+      "Multi-generator: scene, character, camera movement",
+      "Claude API prompt crafting engine",
+      "Export as JSON or plain paragraph",
+      "Supports Seedance 2.0, Kling, Veo, Runway",
+      "Reusable prompt library"
+    ],
+    stack: ["Claude API", "HTML/JS", "Anthropic SDK"],
+    link: "https://example.com/cinegen",
+    image: null,
+    comingSoon: false
+  },
+  {
+    id: 2,
+    name: "CCTV Prompt Generator",
+    slug: "cctv-prompt-generator",
+    category: "prompt",
+    categoryLabel: "Prompt Tool",
+    categoryColor: "purple",
+    emoji: "📹",
+    short: "Turn scene descriptions into CCTV-style AI video prompts",
+    description: "Describe any scene and instantly get a detailed surveillance-camera style prompt optimized for AI video generation. Used by filmmakers and security simulation studios.",
+    features: [
+      "Scene → CCTV prompt in one click",
+      "Camera angle, lens, grain, timestamp style controls",
+      "Supabase usage tracking",
+      "Mobile-ready (Android via Capacitor)",
+      "OpenAI server-side via Edge Functions"
+    ],
+    stack: ["OpenAI", "Supabase", "Capacitor", "HTML/JS"],
+    link: "https://cctvprompt.xyz",
+    image: null,
+    comingSoon: false
+  },
+  {
+    id: 5,
+    name: "Architecture Image Studio",
+    slug: "architecture-image-studio",
+    category: "image",
+    categoryLabel: "Image AI",
+    categoryColor: "blue",
+    emoji: "🏛️",
+    short: "AI-powered architecture image generation",
+    description: "Generate stunning architectural concepts and interior designs using advanced AI models. Perfect for architects, interior designers, and real estate professionals.",
+    features: [
+      "Exterior and interior generation",
+      "Multiple architectural styles",
+      "High-resolution output",
+      "Lighting and environment controls"
+    ],
+    stack: ["React", "AI Image Gen", "Tailwind"],
+    link: "/tool-viewer/5",
+    iframeUrl: "https://architecture-image-studio-635102282857.us-west1.run.app/",
+    image: null,
+    comingSoon: false
+  },
+  {
+    id: 6,
+    name: "Wildlife Image Studio",
+    slug: "wildlife-image-studio",
+    category: "image",
+    categoryLabel: "Image AI",
+    categoryColor: "green",
+    emoji: "🦁",
+    short: "AI-powered wildlife image generation",
+    description: "Generate stunning wildlife photography and concepts using advanced AI models. Perfect for nature enthusiasts, photographers, and creators.",
+    features: [
+      "Realistic wildlife generation",
+      "Multiple environments and biomes",
+      "High-resolution output",
+      "Lighting and camera controls"
+    ],
+    stack: ["React", "AI Image Gen", "Tailwind"],
+    link: "/tool-viewer/6",
+    iframeUrl: "https://wildlife-image-studio-635102282857.us-west1.run.app/",
+    image: null,
+    comingSoon: false
+  },
+  {
+    id: 7,
+    name: "Business & Finance Image Studio",
+    slug: "business-finance-image-studio",
+    category: "image",
+    categoryLabel: "Image AI",
+    categoryColor: "blue",
+    emoji: "📈",
+    short: "AI-powered business and finance image generation",
+    description: "Generate professional business, finance, and corporate imagery using advanced AI models. Perfect for presentations, reports, and marketing materials.",
+    features: [
+      "Professional corporate imagery",
+      "Financial charts and concepts",
+      "High-resolution output",
+      "Lighting and style controls"
+    ],
+    stack: ["React", "AI Image Gen", "Tailwind"],
+    link: "/tool-viewer/7",
+    iframeUrl: "https://business-finance-image-studio-635102282857.us-west1.run.app",
+    image: null,
+    comingSoon: false
+  },
+  {
+    id: 8,
+    name: "Education Image Studio",
+    slug: "education-image-studio",
+    category: "image",
+    categoryLabel: "Image AI",
+    categoryColor: "orange",
+    emoji: "🎓",
+    short: "AI-powered education and learning image generation",
+    description: "Generate engaging educational illustrations, classroom scenes, and e-learning materials using advanced AI models. Perfect for teachers, course creators, and students.",
+    features: [
+      "Educational illustrations",
+      "Classroom and learning scenes",
+      "High-resolution output",
+      "Style and composition controls"
+    ],
+    stack: ["React", "AI Image Gen", "Tailwind"],
+    link: "/tool-viewer/8",
+    iframeUrl: "https://education-image-studio-635102282857.us-west1.run.app",
+    image: null,
+    comingSoon: false
+  },
+  {
+    id: 3,
+    name: "Tool 3",
+    slug: "tool-3",
+    category: "automation",
+    categoryLabel: "Automation",
+    categoryColor: "pink",
+    emoji: "⚡",
+    short: "Your tool description goes here",
+    description: "Add your full tool description here. Explain what problem it solves, who it's for, and what makes it different.",
+    features: [
+      "Feature one",
+      "Feature two",
+      "Feature three"
+    ],
+    stack: ["Stack 1", "Stack 2"],
+    link: "https://example.com",
+    image: null,
+    comingSoon: true
+  },
+  {
+    id: 4,
+    name: "Tool 4",
+    slug: "tool-4",
+    category: "content",
+    categoryLabel: "Content",
+    categoryColor: "teal",
+    emoji: "✍️",
+    short: "Your tool description goes here",
+    description: "Add your full tool description here.",
+    features: ["Feature one", "Feature two"],
+    stack: ["Stack 1", "Stack 2"],
+    link: "https://example.com",
+    image: null,
+    comingSoon: true
+  }
+];
+
+export function Tools() {
+  const [activeFilter, setActiveFilter] = useState('all');
+  const [searchQuery, setSearchQuery] = useState('');
+  
+  const { slug } = useParams();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (slug) {
+      const t = toolsData.find(x => x.slug === slug || x.id.toString() === slug);
+      if (t) {
+        document.title = `${t.name} - Ainario Tools`;
+        const metaDesc = document.querySelector('meta[name="description"]');
+        if (metaDesc) {
+          metaDesc.setAttribute('content', t.description || t.short || '');
+        } else {
+          const meta = document.createElement('meta');
+          meta.name = 'description';
+          meta.content = t.description || t.short || '';
+          document.head.appendChild(meta);
+        }
+      }
+    } else {
+      document.title = 'Tools - Ainario AI Agency';
+    }
+  }, [slug]);
+
+  const handleBack = () => {
+    navigate('/tools');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const filteredTools = toolsData.filter(t => {
+    const matchFilter = activeFilter === 'all' || t.category === activeFilter;
+    const matchSearch = !searchQuery || 
+      t.name.toLowerCase().includes(searchQuery) || 
+      t.short.toLowerCase().includes(searchQuery) ||
+      t.categoryLabel.toLowerCase().includes(searchQuery) ||
+      t.stack.some(s => s.toLowerCase().includes(searchQuery));
+    return matchFilter && matchSearch;
+  });
+
+  // Sort: live first, then coming soon
+  const sortedTools = [...filteredTools].sort((a, b) => {
+    if (a.comingSoon === b.comingSoon) return 0;
+    return a.comingSoon ? 1 : -1;
+  });
+
+  if (slug) {
+    const t = toolsData.find(x => x.slug === slug || x.id.toString() === slug);
+    if (!t) return null;
+
+    const related = toolsData.filter(x => x.id !== t.id && !x.comingSoon && x.category === t.category).slice(0, 3);
+    const allOther = toolsData.filter(x => x.id !== t.id && !x.comingSoon).slice(0, 3 - related.length);
+    const relatedAll = [...related, ...allOther].slice(0, 3);
+
+    return (
+      <div id="page-detail" className="page-in" style={{ display: 'block' }}>
+        <span className="detail-back" onClick={handleBack}>Back to Tools</span>
+
+        <div className="detail-hero">
+          <div className="detail-meta">
+            <p className={`detail-category ${t.categoryColor}`}>{t.categoryLabel}</p>
+            <h1 className="detail-title">{t.name}</h1>
+            <p className="detail-desc">{t.description}</p>
+
+            <div className="detail-features">
+              <h4>What it does</h4>
+              {t.features.map((f, i) => (
+                <div className="feature-item" key={i}>
+                  <span className="feature-check">✓</span>
+                  <span>{f}</span>
+                </div>
+              ))}
+            </div>
+
+            <div className="detail-stack">
+              {t.stack.map((s, i) => <span className="detail-tag" key={i}>{s}</span>)}
+            </div>
+
+            <div>
+              {t.iframeUrl ? (
+                <Link to={`/tool-viewer/${t.slug || t.id}`} className="detail-cta">
+                  Open Tool
+                </Link>
+              ) : (
+                <a href={t.link} target="_blank" rel="noopener noreferrer" className="detail-cta">
+                  Open Tool
+                </a>
+              )}
+              <a href="/#contact" className="detail-cta-ghost">Request Custom Version</a>
+            </div>
+          </div>
+
+          <div className="detail-image-panel">
+            <div className="detail-main-image">
+              {t.image ? (
+                <img src={t.image} alt={t.name} />
+              ) : (
+                <div className="detail-placeholder">{t.emoji}</div>
+              )}
+            </div>
+            <div className="detail-thumbs">
+              <div className="detail-thumb active">{t.emoji}</div>
+              <div className="detail-thumb">📐</div>
+              <div className="detail-thumb">⚙️</div>
+            </div>
+          </div>
+        </div>
+
+        <div className="related-section">
+          <h3>More Tools</h3>
+          <div className="related-grid">
+            {relatedAll.map(r => (
+              <Link to={`/tools/${r.slug || r.id}`} className="tool-card" key={r.id} style={{ textDecoration: 'none', color: 'inherit' }}>
+                <div className="card-image">
+                  {r.image ? (
+                    <img src={r.image} alt={r.name} loading="lazy" />
+                  ) : (
+                    <div className="card-image-placeholder">{r.emoji}</div>
+                  )}
+                  <div className="card-overlay"><div className="overlay-btn">Explore Tool</div></div>
+                </div>
+                <div className="card-body">
+                  <p className={`card-category ${r.categoryColor}`}>{r.categoryLabel}</p>
+                  <h3>{r.name}</h3>
+                  <p>{r.short}</p>
+                </div>
+                <div className="card-footer">
+                  <div className="card-stack">
+                    {r.stack.slice(0, 2).map((s, i) => <span className="mini-tag" key={i}>{s}</span>)}
+                  </div>
+                  <span className="card-arrow">↗</span>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div id="page-grid" style={{ display: 'block' }}>
+      <div className="grid-hero">
+        <div className="grid-hero-bg" style={{ background: 'radial-gradient(ellipse 60% 50% at 50% 0%, rgba(0,229,192,0.12) 0%, transparent 70%)' }}></div>
+        <div className="grid-hero-inner">
+          <p className="page-label">Ainario Tools</p>
+          <h1>AI Tools We<br/><em>Actually Use</em></h1>
+          <p>A curated set of standalone tools built by Ainario — free to try, ready to embed, or available as a starting point for your product.</p>
+        </div>
+      </div>
+
+      <div className="filters-bar">
+        <button className={`filter-btn ${activeFilter === 'all' ? 'active' : ''}`} onClick={() => setActiveFilter('all')}>All</button>
+        <button className={`filter-btn ${activeFilter === 'image' ? 'active' : ''}`} onClick={() => setActiveFilter('image')}>Image AI</button>
+        <button className={`filter-btn ${activeFilter === 'video' ? 'active' : ''}`} onClick={() => setActiveFilter('video')}>Video AI</button>
+        <button className={`filter-btn ${activeFilter === 'prompt' ? 'active' : ''}`} onClick={() => setActiveFilter('prompt')}>Prompt Tools</button>
+        <button className={`filter-btn ${activeFilter === 'automation' ? 'active' : ''}`} onClick={() => setActiveFilter('automation')}>Automation</button>
+        <button className={`filter-btn ${activeFilter === 'content' ? 'active' : ''}`} onClick={() => setActiveFilter('content')}>Content</button>
+        <button className={`filter-btn ${activeFilter === 'analytics' ? 'active' : ''}`} onClick={() => setActiveFilter('analytics')}>Analytics</button>
+        <div className="search-wrap">
+          <span className="search-icon">⌕</span>
+          <input 
+            className="search-input" 
+            type="text" 
+            placeholder="Search tools..." 
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+        </div>
+        <span className="count-badge">
+          {filteredTools.filter(t => !t.comingSoon).length} tool{filteredTools.filter(t => !t.comingSoon).length !== 1 ? 's' : ''}
+          {filteredTools.some(t => t.comingSoon) && ` · ${filteredTools.filter(t => t.comingSoon).length} coming soon`}
+        </span>
+      </div>
+
+      <div className="tools-grid">
+        {sortedTools.length === 0 ? (
+          <div className="empty-state">
+            <span style={{ fontSize: '40px' }}>🔍</span>
+            <p>No tools found. Try a different filter.</p>
+          </div>
+        ) : (
+          sortedTools.map((t, i) => {
+            const inner = (
+              <>
+                <div className="card-image">
+                  {t.image ? (
+                    <img src={t.image} alt={t.name} loading="lazy" />
+                  ) : (
+                    <div className="card-image-placeholder">{t.emoji}</div>
+                  )}
+                  {t.comingSoon && <div className="coming-badge">Coming Soon</div>}
+                  <div className="card-overlay"><div className="overlay-btn">Explore Tool</div></div>
+                </div>
+                <div className="card-body">
+                  <p className={`card-category ${t.categoryColor}`}>{t.categoryLabel}</p>
+                  <h3>{t.name}</h3>
+                  <p>{t.short}</p>
+                </div>
+                <div className="card-footer">
+                  <div className="card-stack">
+                    {t.stack.slice(0, 3).map((s, j) => <span className="mini-tag" key={j}>{s}</span>)}
+                  </div>
+                  <span className="card-arrow">↗</span>
+                </div>
+              </>
+            );
+
+            if (t.comingSoon) {
+              return (
+                <div 
+                  className={`tool-card card-in coming-soon`} 
+                  style={{ animationDelay: `${i * 40}ms` }} 
+                  key={t.id}
+                >
+                  {inner}
+                </div>
+              );
+            }
+
+            return (
+              <Link 
+                to={`/tools/${t.slug || t.id}`}
+                className={`tool-card card-in`} 
+                style={{ animationDelay: `${i * 40}ms`, textDecoration: 'none', color: 'inherit' }} 
+                key={t.id}
+              >
+                {inner}
+              </Link>
+            );
+          })
+        )}
+      </div>
+    </div>
+  );
+}

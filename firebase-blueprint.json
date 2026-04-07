@@ -1,0 +1,24 @@
+{
+  "entities": {
+    "Template": {
+      "title": "Template",
+      "description": "A template item with an image and details",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string" },
+        "description": { "type": "string" },
+        "imageUrl": { "type": "string", "description": "Base64 encoded image or URL" },
+        "category": { "type": "string" },
+        "authorUid": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["title", "imageUrl", "authorUid", "createdAt"]
+    }
+  },
+  "firestore": {
+    "/templates/{templateId}": {
+      "schema": { "$ref": "#/entities/Template" },
+      "description": "Stores all templates"
+    }
+  }
+}
