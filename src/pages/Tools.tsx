@@ -89,6 +89,138 @@ export const toolsData = [
     iframeUrl: "https://education-image-studio-635102282857.us-west1.run.app",
     image: null,
     comingSoon: false
+  },
+  {
+    id: 9,
+    name: "SawtSync Arabic/Darija Transcriber",
+    slug: "sawtsync-transcriber",
+    category: "audio",
+    categoryLabel: "Audio AI",
+    categoryColor: "purple",
+    emoji: "🎙️",
+    short: "AI-powered Arabic and Darija transcription",
+    description: "Transcribe Arabic and Darija audio accurately using advanced AI models. Perfect for content creators, journalists, and businesses.",
+    features: [
+      "Arabic transcription",
+      "Darija transcription",
+      "High accuracy",
+      "Fast processing"
+    ],
+    stack: ["React", "AI Audio", "Tailwind"],
+    link: "/tool-viewer/9",
+    iframeUrl: "https://sawtsync-arabic-darija-transcriber-635102282857.us-west1.run.app",
+    image: null,
+    comingSoon: false
+  },
+  {
+    id: 10,
+    name: "Speech Buddy",
+    slug: "speech-buddy",
+    category: "audio",
+    categoryLabel: "Audio AI",
+    categoryColor: "purple",
+    emoji: "🗣️",
+    short: "AI-powered speech companion and analysis",
+    description: "Your personal AI speech companion. Analyze, improve, and practice your speech with real-time feedback and advanced audio processing.",
+    features: [
+      "Real-time speech analysis",
+      "Pronunciation feedback",
+      "Pacing and tone detection",
+      "Interactive practice sessions"
+    ],
+    stack: ["React", "AI Audio", "Tailwind"],
+    link: "/tool-viewer/10",
+    iframeUrl: "https://speech-buddy-635102282857.us-west1.run.app",
+    image: null,
+    comingSoon: false
+  },
+  {
+    id: 11,
+    name: "AdGenius Prompt Studio",
+    slug: "adgenius-prompt-studio",
+    category: "prompt",
+    categoryLabel: "Prompt Tools",
+    categoryColor: "orange",
+    emoji: "🎯",
+    short: "AI-powered ad copy and creative prompts",
+    description: "Generate high-converting ad copy and creative prompts using advanced AI. Perfect for marketers, agencies, and copywriters looking to scale their campaigns.",
+    features: [
+      "Ad copy generation",
+      "Creative concept prompts",
+      "Multiple platform formats",
+      "High conversion focus"
+    ],
+    stack: ["React", "AI Prompts", "Tailwind"],
+    link: "/tool-viewer/11",
+    iframeUrl: "https://adgenius-prompt-studio-635102282857.us-west1.run.app",
+    image: null,
+    comingSoon: false
+  },
+  {
+    id: 12,
+    name: "Kaftan Studio AI",
+    slug: "kaftan-studio-ai",
+    category: "image",
+    categoryLabel: "Image AI",
+    categoryColor: "blue",
+    emoji: "👗",
+    short: "AI-powered Kaftan design generation",
+    description: "Generate stunning Kaftan designs and fashion concepts using advanced AI models. Perfect for fashion designers, boutiques, and creators.",
+    features: [
+      "Kaftan design generation",
+      "Multiple fashion styles",
+      "High-resolution output",
+      "Color and pattern controls"
+    ],
+    stack: ["React", "AI Image Gen", "Tailwind"],
+    link: "/tool-viewer/12",
+    iframeUrl: "https://kaftan-studio-ai-635102282857.us-west1.run.app",
+    image: null,
+    comingSoon: false
+  },
+  {
+    id: 13,
+    name: "Etsy Listing Generator",
+    slug: "etsy-listing-generator",
+    category: "content",
+    categoryLabel: "Content AI",
+    categoryColor: "green",
+    emoji: "🛍️",
+    short: "AI-powered Etsy listing generation",
+    description: "Generate SEO-optimized Etsy product listings, titles, and tags using advanced AI. Perfect for Etsy sellers looking to boost their shop's visibility and sales.",
+    features: [
+      "SEO-optimized titles",
+      "Engaging product descriptions",
+      "Relevant tag generation",
+      "Conversion-focused copy"
+    ],
+    stack: ["React", "AI Content", "Tailwind"],
+    link: "/tool-viewer/13",
+    iframeUrl: "https://etsy-listing-generator-635102282857.us-west1.run.app",
+    image: null,
+    comingSoon: false
+  },
+  {
+    id: 14,
+    name: "MarketForge",
+    slug: "marketforge",
+    category: "automation",
+    categoryLabel: "Automation AI",
+    categoryColor: "blue",
+    emoji: "📈",
+    short: "AI-powered marketing and business forging",
+    description: "A comprehensive suite for forging marketing strategies, content, and business analytics using advanced AI.",
+    features: [
+      "Marketing strategy generation",
+      "Content creation",
+      "Business analytics",
+      "Campaign forging"
+    ],
+    stack: ["React", "AI Automation", "Tailwind"],
+    link: "/tool-viewer/14",
+    iframeUrl: "https://marketforge-635102282857.us-west1.run.app",
+    image: null,
+    comingSoon: false
   }
 ];
 
@@ -248,6 +380,7 @@ export function Tools() {
       <div className="filters-bar">
         <button className={`filter-btn ${activeFilter === 'all' ? 'active' : ''}`} onClick={() => setActiveFilter('all')}>All</button>
         <button className={`filter-btn ${activeFilter === 'image' ? 'active' : ''}`} onClick={() => setActiveFilter('image')}>Image AI</button>
+        <button className={`filter-btn ${activeFilter === 'audio' ? 'active' : ''}`} onClick={() => setActiveFilter('audio')}>Audio AI</button>
         <button className={`filter-btn ${activeFilter === 'prompt' ? 'active' : ''}`} onClick={() => setActiveFilter('prompt')}>Prompt Tools</button>
         <button className={`filter-btn ${activeFilter === 'automation' ? 'active' : ''}`} onClick={() => setActiveFilter('automation')}>Automation</button>
         <button className={`filter-btn ${activeFilter === 'content' ? 'active' : ''}`} onClick={() => setActiveFilter('content')}>Content</button>
