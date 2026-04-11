@@ -62,21 +62,23 @@ service cloud.firestore {
     }
 
     match /templates/{templateId} {
-      // Anyone can read templates
       allow read: if true;
+      allow create: if isAuthenticated() && isValidTemplate(request.resource.data) && request.resource.data.authorUid == request.auth.uid;
+      allow update: if isAuthenticated() && isDocOwner() && isValidTemplate(request.resource.data) && uidNotModified() && request.resource.data.createdAt == resource.data.createdAt;
+      allow delete: if isAuthenticated() && isDocOwner();
+    }
 
-      // Only authenticated users can create templates, and they must be the author
-      allow create: if isAuthenticated() &&
-                    isValidTemplate(request.resource.data) &&
-                    request.resource.data.authorUid == request.auth.uid;
+    match /tools/{toolId} {
+      allow read: if true;
+      allow create: if isAuthenticated() && isValidTemplate(request.resource.data) && request.resource.data.authorUid == request.auth.uid;
+      allow update: if isAuthenticated() && isDocOwner() && isValidTemplate(request.resource.data) && uidNotModified() && request.resource.data.createdAt == resource.data.createdAt;
+      allow delete: if isAuthenticated() && isDocOwner();
+    }
 
-      // Only the author can update or delete their templates
-      allow update: if isAuthenticated() &&
-                    isDocOwner() &&
-                    isValidTemplate(request.resource.data) &&
-                    uidNotModified() &&
-                    request.resource.data.createdAt == resource.data.createdAt;
-
+    match /portfolio/{portfolioId} {
+      allow read: if true;
+      allow create: if isAuthenticated() && isValidTemplate(request.resource.data) && request.resource.data.authorUid == request.auth.uid;
+      allow update: if isAuthenticated() && isDocOwner() && isValidTemplate(request.resource.data) && uidNotModified() && request.resource.data.createdAt == resource.data.createdAt;
       allow delete: if isAuthenticated() && isDocOwner();
     }
   }

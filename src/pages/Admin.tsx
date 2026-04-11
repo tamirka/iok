@@ -3,6 +3,8 @@ import { db, auth } from '../firebase';
 import { collection, addDoc, updateDoc, doc, deleteDoc, serverTimestamp, onSnapshot, query } from 'firebase/firestore';
 import { signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from 'firebase/auth';
 import { templatesData } from './Templates';
+import { toolsData } from './Tools';
+import { portfolioData } from './Portfolio';
 
 export function Admin() {
   const [user, setUser] = useState<any>(null);
@@ -10,8 +12,14 @@ export function Admin() {
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  
+  const [activeTab, setActiveTab] = useState<'templates' | 'tools' | 'portfolio'>('templates');
+  
   const [dbTemplates, setDbTemplates] = useState<any[]>([]);
-  const [selectedTemplateId, setSelectedTemplateId] = useState<string>('new');
+  const [dbTools, setDbTools] = useState<any[]>([]);
+  const [dbPortfolio, setDbPortfolio] = useState<any[]>([]);
+  
+  const [selectedItemId, setSelectedItemId] = useState<string>('new');
 
   const defaultForm = {
     title: '',
@@ -25,6 +33,7 @@ export function Admin() {
     features: '',
     stack: '',
     link: '',
+    iframeUrl: '',
     imageUrl: ''
   };
 
@@ -40,32 +49,77 @@ export function Admin() {
 
   useEffect(() => {
     if (!user) return;
-    const q = query(collection(db, 'templates'));
-    const unsubscribe = onSnapshot(q, (snapshot) => {
-      const templates = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
-      setDbTemplates(templates);
+    
+    const unsubTemplates = onSnapshot(query(collection(db, 'templates')), (snapshot) => {
+      setDbTemplates(snapshot.docs.map(d => ({ id: d.id, ...d.data() })));
     });
-    return () => unsubscribe();
+    
+    const unsubTools = onSnapshot(query(collection(db, 'tools')), (snapshot) => {
+      setDbTools(snapshot.docs.map(d => ({ id: d.id, ...d.data() })));
+    });
+    
+    const unsubPortfolio = onSnapshot(query(collection(db, 'portfolio')), (snapshot) => {
+      setDbPortfolio(snapshot.docs.map(d => ({ id: d.id, ...d.data() })));
+    });
+    
+    return () => {
+      unsubTemplates();
+      unsubTools();
+      unsubPortfolio();
+    };
   }, [user]);
 
-  const allTemplates = [
-    ...dbTemplates,
-    ...templatesData.filter(staticT => !dbTemplates.some(dbT => 
-      (dbT.originalId && dbT.originalId.toString() === staticT.id.toString()) || 
-      (dbT.title && staticT.name && dbT.title.toLowerCase().trim() === staticT.name.toLowerCase().trim())
-    ))
-  ];
+  const getActiveData = () => {
+    if (activeTab === 'templates') {
+      return [
+        ...dbTemplates,
+        ...templatesData.filter(staticT => !dbTemplates.some(dbT => 
+          (dbT.originalId && dbT.originalId.toString() === staticT.id.toString()) || 
+          (dbT.title && staticT.name && dbT.title.toLowerCase().trim() === staticT.name.toLowerCase().trim())
+        ))
+      ];
+    }
+    if (activeTab === 'tools') {
+      return [
+        ...dbTools,
+        ...toolsData.filter(staticT => !dbTools.some(dbT => 
+          (dbT.originalId && dbT.originalId.toString() === staticT.id.toString()) || 
+          (dbT.title && staticT.name && dbT.title.toLowerCase().trim() === staticT.name.toLowerCase().trim())
+        ))
+      ];
+    }
+    if (activeTab === 'portfolio') {
+      return [
+        ...dbPortfolio,
+        ...portfolioData.filter(staticP => !dbPortfolio.some(dbP => 
+          (dbP.originalId && dbP.originalId.toString() === staticP.id.toString()) || 
+          (dbP.title && staticP.name && dbP.title.toLowerCase().trim() === staticP.name.toLowerCase().trim())
+        ))
+      ];
+    }
+    return [];
+  };
 
-  const handleSelectTemplate = (e: React.ChangeEvent<HTMLSelectElement>) => {
+  const allItems = getActiveData();
+
+  const handleTabChange = (tab: 'templates' | 'tools' | 'portfolio') => {
+    setActiveTab(tab);
+    setSelectedItemId('new');
+    setFormData(defaultForm);
+    setError('');
+    setSuccess('');
+  };
+
+  const handleSelectItem = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const val = e.target.value;
-    setSelectedTemplateId(val);
+    setSelectedItemId(val);
     setError('');
     setSuccess('');
 
     if (val === 'new') {
       setFormData(defaultForm);
     } else {
-      const t = allTemplates.find(x => x.id.toString() === val);
+      const t = allItems.find(x => x.id.toString() === val);
       if (t) {
         setFormData({
           title: t.title || t.name || '',
@@ -79,6 +133,7 @@ export function Admin() {
           features: Array.isArray(t.features) ? t.features.join(', ') : (t.features || ''),
           stack: Array.isArray(t.stack) ? t.stack.join(', ') : (t.stack || ''),
           link: t.link || '',
+          iframeUrl: t.iframeUrl || '',
           imageUrl: t.imageUrl || t.image || ''
         });
       }
@@ -99,19 +154,25 @@ export function Admin() {
   };
 
   const handleDelete = async () => {
-    if (selectedTemplateId === 'new') return;
-    const existingDbTemplate = dbTemplates.find(t => t.id === selectedTemplateId);
-    if (existingDbTemplate) {
+    if (selectedItemId === 'new') return;
+    
+    let currentDbItems = [];
+    if (activeTab === 'templates') currentDbItems = dbTemplates;
+    if (activeTab === 'tools') currentDbItems = dbTools;
+    if (activeTab === 'portfolio') currentDbItems = dbPortfolio;
+
+    const existingDbItem = currentDbItems.find(t => t.id === selectedItemId);
+    if (existingDbItem) {
       try {
-        await deleteDoc(doc(db, 'templates', selectedTemplateId));
-        setSuccess('Template deleted successfully!');
-        setSelectedTemplateId('new');
+        await deleteDoc(doc(db, activeTab, selectedItemId));
+        setSuccess('Item deleted successfully!');
+        setSelectedItemId('new');
         setFormData(defaultForm);
       } catch (err: any) {
         setError(err.message);
       }
     } else {
-      setError("You cannot delete a default static template. You can only edit it to override it.");
+      setError("You cannot delete a default static item. You can only edit it to override it.");
     }
   };
 
@@ -183,29 +244,33 @@ export function Admin() {
         features: formData.features.split(',').map(s => s.trim()).filter(Boolean),
         stack: formData.stack.split(',').map(s => s.trim()).filter(Boolean),
         link: formData.link,
+        iframeUrl: formData.iframeUrl,
         imageUrl: formData.imageUrl,
         authorUid: user.uid
       };
 
-      const isOverridingStatic = selectedTemplateId !== 'new' && !dbTemplates.find(t => t.id === selectedTemplateId);
+      let currentDbItems = [];
+      if (activeTab === 'templates') currentDbItems = dbTemplates;
+      if (activeTab === 'tools') currentDbItems = dbTools;
+      if (activeTab === 'portfolio') currentDbItems = dbPortfolio;
+
+      const isOverridingStatic = selectedItemId !== 'new' && !currentDbItems.find(t => t.id === selectedItemId);
       if (isOverridingStatic) {
-        dataToSave.originalId = selectedTemplateId.toString();
+        dataToSave.originalId = selectedItemId.toString();
       }
 
-      // If editing an existing DB template
-      const existingDbTemplate = dbTemplates.find(t => t.id === selectedTemplateId);
+      const existingDbItem = currentDbItems.find(t => t.id === selectedItemId);
       
-      if (existingDbTemplate) {
-        await updateDoc(doc(db, 'templates', selectedTemplateId), dataToSave);
-        setSuccess('Template updated successfully!');
+      if (existingDbItem) {
+        await updateDoc(doc(db, activeTab, selectedItemId), dataToSave);
+        setSuccess('Item updated successfully!');
       } else {
-        // Creating new OR overriding a static template
-        await addDoc(collection(db, 'templates'), {
+        await addDoc(collection(db, activeTab), {
           ...dataToSave,
           createdAt: serverTimestamp()
         });
-        setSuccess('Template saved successfully!');
-        if (selectedTemplateId === 'new') {
+        setSuccess('Item saved successfully!');
+        if (selectedItemId === 'new') {
           setFormData(defaultForm);
         }
       }
@@ -236,15 +301,36 @@ export function Admin() {
           <button onClick={handleLogout} style={{ background: 'transparent', color: 'var(--text)', border: '1px solid var(--border)', padding: '8px 16px', borderRadius: '6px' }}>Logout</button>
         </div>
         
+        <div style={{ display: 'flex', gap: '10px', marginBottom: '20px' }}>
+          <button 
+            onClick={() => handleTabChange('templates')} 
+            style={{ flex: 1, padding: '10px', background: activeTab === 'templates' ? 'var(--accent)' : 'var(--card)', color: 'white', border: '1px solid var(--border)', borderRadius: '6px' }}
+          >
+            Templates
+          </button>
+          <button 
+            onClick={() => handleTabChange('tools')} 
+            style={{ flex: 1, padding: '10px', background: activeTab === 'tools' ? 'var(--accent)' : 'var(--card)', color: 'white', border: '1px solid var(--border)', borderRadius: '6px' }}
+          >
+            Tools
+          </button>
+          <button 
+            onClick={() => handleTabChange('portfolio')} 
+            style={{ flex: 1, padding: '10px', background: activeTab === 'portfolio' ? 'var(--accent)' : 'var(--card)', color: 'white', border: '1px solid var(--border)', borderRadius: '6px' }}
+          >
+            Portfolio
+          </button>
+        </div>
+
         {error && <div style={{ padding: '10px', background: 'rgba(255,0,0,0.1)', color: '#ff5c87', marginBottom: '20px', borderRadius: '6px' }}>{error}</div>}
         {success && <div style={{ padding: '10px', background: 'rgba(0,229,192,0.1)', color: '#00e5c0', marginBottom: '20px', borderRadius: '6px' }}>{success}</div>}
 
         <div style={{ marginBottom: '24px' }}>
-          <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold' }}>Select Template to Edit</label>
-          <select value={selectedTemplateId} onChange={handleSelectTemplate} style={{ width: '100%', padding: '12px', background: 'var(--card)', border: '1px solid var(--accent)', color: 'white', borderRadius: '6px', fontSize: '16px' }}>
-            <option value="new">✨ Create New Template</option>
-            <optgroup label="Existing Templates">
-              {allTemplates.map(t => (
+          <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold' }}>Select Item to Edit</label>
+          <select value={selectedItemId} onChange={handleSelectItem} style={{ width: '100%', padding: '12px', background: 'var(--card)', border: '1px solid var(--accent)', color: 'white', borderRadius: '6px', fontSize: '16px' }}>
+            <option value="new">✨ Create New {activeTab.charAt(0).toUpperCase() + activeTab.slice(1)}</option>
+            <optgroup label={`Existing ${activeTab.charAt(0).toUpperCase() + activeTab.slice(1)}`}>
+              {allItems.map(t => (
                 <option key={t.id} value={t.id}>{t.title || t.name}</option>
               ))}
             </optgroup>
@@ -252,7 +338,7 @@ export function Admin() {
         </div>
 
         <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px', background: 'rgba(255,255,255,0.02)', padding: '24px', borderRadius: '12px', border: '1px solid var(--border)' }}>
-          <h3 style={{ marginBottom: '10px' }}>{selectedTemplateId === 'new' ? 'New Template Details' : 'Edit Template Details'}</h3>
+          <h3 style={{ marginBottom: '10px' }}>{selectedItemId === 'new' ? 'New Item Details' : 'Edit Item Details'}</h3>
           
           <div>
             <label style={{ display: 'block', marginBottom: '8px' }}>Title</label>
@@ -271,29 +357,23 @@ export function Admin() {
 
           <div>
             <label style={{ display: 'block', marginBottom: '8px' }}>Full Description</label>
-            <textarea required value={formData.description} onChange={e => setFormData({...formData, description: e.target.value})} style={{ width: '100%', padding: '10px', background: 'var(--card)', border: '1px solid var(--border)', color: 'white', borderRadius: '6px', minHeight: '100px' }} />
+            <textarea value={formData.description} onChange={e => setFormData({...formData, description: e.target.value})} style={{ width: '100%', padding: '10px', background: 'var(--card)', border: '1px solid var(--border)', color: 'white', borderRadius: '6px', minHeight: '100px' }} />
           </div>
 
           <div style={{ display: 'flex', gap: '16px' }}>
             <div style={{ flex: 1 }}>
               <label style={{ display: 'block', marginBottom: '8px' }}>Category ID</label>
-              <select value={formData.category} onChange={e => setFormData({...formData, category: e.target.value})} style={{ width: '100%', padding: '10px', background: 'var(--card)', border: '1px solid var(--border)', color: 'white', borderRadius: '6px' }}>
-                <option value="web">Web</option>
-                <option value="agent">Agent</option>
-                <option value="chatbot">Chatbot</option>
-                <option value="social">Social</option>
-                <option value="mobile">Mobile</option>
-              </select>
+              <input required type="text" value={formData.category} onChange={e => setFormData({...formData, category: e.target.value})} style={{ width: '100%', padding: '10px', background: 'var(--card)', border: '1px solid var(--border)', color: 'white', borderRadius: '6px' }} />
             </div>
             <div style={{ flex: 1 }}>
               <label style={{ display: 'block', marginBottom: '8px' }}>Category Label</label>
-              <input required type="text" value={formData.categoryLabel} onChange={e => setFormData({...formData, categoryLabel: e.target.value})} style={{ width: '100%', padding: '10px', background: 'var(--card)', border: '1px solid var(--border)', color: 'white', borderRadius: '6px' }} />
+              <input type="text" value={formData.categoryLabel} onChange={e => setFormData({...formData, categoryLabel: e.target.value})} style={{ width: '100%', padding: '10px', background: 'var(--card)', border: '1px solid var(--border)', color: 'white', borderRadius: '6px' }} />
             </div>
           </div>
 
           <div style={{ display: 'flex', gap: '16px' }}>
             <div style={{ flex: 1 }}>
-              <label style={{ display: 'block', marginBottom: '8px' }}>Color (purple, pink, green)</label>
+              <label style={{ display: 'block', marginBottom: '8px' }}>Color (purple, pink, green, blue, orange)</label>
               <input required type="text" value={formData.categoryColor} onChange={e => setFormData({...formData, categoryColor: e.target.value})} style={{ width: '100%', padding: '10px', background: 'var(--card)', border: '1px solid var(--border)', color: 'white', borderRadius: '6px' }} />
             </div>
             <div style={{ flex: 1 }}>
@@ -304,7 +384,7 @@ export function Admin() {
 
           <div>
             <label style={{ display: 'block', marginBottom: '8px' }}>Features (comma separated)</label>
-            <input required type="text" value={formData.features} onChange={e => setFormData({...formData, features: e.target.value})} style={{ width: '100%', padding: '10px', background: 'var(--card)', border: '1px solid var(--border)', color: 'white', borderRadius: '6px' }} />
+            <input type="text" value={formData.features} onChange={e => setFormData({...formData, features: e.target.value})} style={{ width: '100%', padding: '10px', background: 'var(--card)', border: '1px solid var(--border)', color: 'white', borderRadius: '6px' }} />
           </div>
 
           <div>
@@ -313,8 +393,13 @@ export function Admin() {
           </div>
 
           <div>
-            <label style={{ display: 'block', marginBottom: '8px' }}>Live Demo Link</label>
+            <label style={{ display: 'block', marginBottom: '8px' }}>Live Demo Link (External URL)</label>
             <input type="text" value={formData.link} onChange={e => setFormData({...formData, link: e.target.value})} style={{ width: '100%', padding: '10px', background: 'var(--card)', border: '1px solid var(--border)', color: 'white', borderRadius: '6px' }} />
+          </div>
+
+          <div>
+            <label style={{ display: 'block', marginBottom: '8px' }}>Iframe URL (For Tools/Portfolio Viewer)</label>
+            <input type="text" value={formData.iframeUrl} onChange={e => setFormData({...formData, iframeUrl: e.target.value})} style={{ width: '100%', padding: '10px', background: 'var(--card)', border: '1px solid var(--border)', color: 'white', borderRadius: '6px' }} />
           </div>
 
           <div>
@@ -325,9 +410,9 @@ export function Admin() {
 
           <div style={{ display: 'flex', gap: '16px', marginTop: '20px' }}>
             <button type="submit" disabled={uploading} className="nav-cta" style={{ flex: 1, padding: '14px', fontSize: '16px' }}>
-              {uploading ? 'Saving...' : (selectedTemplateId === 'new' ? 'Create Template' : 'Save Changes')}
+              {uploading ? 'Saving...' : (selectedItemId === 'new' ? 'Create Item' : 'Save Changes')}
             </button>
-            {selectedTemplateId !== 'new' && (
+            {selectedItemId !== 'new' && (
               <button 
                 type="button" 
                 onClick={handleDelete}

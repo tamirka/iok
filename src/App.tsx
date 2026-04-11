@@ -13,6 +13,8 @@ import { Templates } from './pages/Templates';
 import { Tools } from './pages/Tools';
 import { ToolViewer } from './pages/ToolViewer';
 import { Filmmaking } from './pages/Filmmaking';
+import { Portfolio } from './pages/Portfolio';
+import { PortfolioViewer } from './pages/PortfolioViewer';
 import { Admin } from './pages/Admin';
 
 export default function App() {
@@ -23,13 +25,15 @@ export default function App() {
       <Cursor />
       <Nav />
       <Routes>
-        <Route path="/" element={<Home />} />
+        <Route path="/" element={<Portfolio />} />
+        <Route path="/ai-services" element={<Home />} />
         <Route path="/templates" element={<Templates />} />
         <Route path="/templates/:slug" element={<Templates />} />
         <Route path="/tools" element={<Tools />} />
         <Route path="/tools/:slug" element={<Tools />} />
         <Route path="/tool-viewer/:slug" element={<ToolViewer />} />
         <Route path="/filmmaking" element={<Filmmaking />} />
+        <Route path="/portfolio-viewer/:slug" element={<PortfolioViewer />} />
         <Route path="/admin" element={<Admin />} />
       </Routes>
       <Footer />

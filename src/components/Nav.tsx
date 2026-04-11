@@ -22,12 +22,17 @@ export function Nav() {
     };
   }, [isMobileMenuOpen]);
 
+  if (location.pathname.startsWith('/tool-viewer/') || location.pathname.startsWith('/portfolio-viewer/')) {
+    return null;
+  }
+
   return (
     <>
       <nav>
         <Link to="/" className="logo">Ain<span>ario</span></Link>
         <ul className="desktop-nav">
           <li><Link to="/" className={location.pathname === '/' ? 'active' : ''}>Home</Link></li>
+          <li><Link to="/ai-services" className={location.pathname === '/ai-services' ? 'active' : ''}>AI Services</Link></li>
           <li><Link to="/filmmaking" className={location.pathname === '/filmmaking' ? 'active' : ''}>Filmmaking</Link></li>
           <li><Link to="/templates" className={location.pathname === '/templates' ? 'active' : ''}>Templates</Link></li>
           <li><Link to="/tools" className={location.pathname === '/tools' ? 'active' : ''}>Tools</Link></li>
@@ -47,6 +52,7 @@ export function Nav() {
       <div className={`mobile-menu-overlay ${isMobileMenuOpen ? 'open' : ''}`}>
         <ul className="mobile-nav-links">
           <li><Link to="/" className={location.pathname === '/' ? 'active' : ''} onClick={() => setIsMobileMenuOpen(false)}>Home</Link></li>
+          <li><Link to="/ai-services" className={location.pathname === '/ai-services' ? 'active' : ''} onClick={() => setIsMobileMenuOpen(false)}>AI Services</Link></li>
           <li><Link to="/filmmaking" className={location.pathname === '/filmmaking' ? 'active' : ''} onClick={() => setIsMobileMenuOpen(false)}>Filmmaking</Link></li>
           <li><Link to="/templates" className={location.pathname === '/templates' ? 'active' : ''} onClick={() => setIsMobileMenuOpen(false)}>Templates</Link></li>
           <li><Link to="/tools" className={location.pathname === '/tools' ? 'active' : ''} onClick={() => setIsMobileMenuOpen(false)}>Tools</Link></li>

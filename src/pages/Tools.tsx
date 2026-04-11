@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
+import { db } from '../firebase';
+import { collection, onSnapshot, query, orderBy } from 'firebase/firestore';
 
 export const toolsData = [
   {
@@ -227,13 +229,39 @@ export const toolsData = [
 export function Tools() {
   const [activeFilter, setActiveFilter] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
+  const [dbTools, setDbTools] = useState<any[]>([]);
   
   const { slug } = useParams();
   const navigate = useNavigate();
 
   useEffect(() => {
+    const q = query(collection(db, 'tools'), orderBy('createdAt', 'desc'));
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const tools = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+      setDbTools(tools);
+    });
+    return () => unsubscribe();
+  }, []);
+
+  const allTools = [
+    ...dbTools,
+    ...toolsData.filter(staticT => !dbTools.some(dbT => 
+      (dbT.originalId && dbT.originalId.toString() === staticT.id.toString()) || 
+      (dbT.title && staticT.name && dbT.title.toLowerCase().trim() === staticT.name.toLowerCase().trim())
+    )).map(t => ({
+      ...t,
+      title: t.name,
+      imageUrl: t.image
+    }))
+  ].map(t => ({
+    ...t,
+    name: t.title || t.name,
+    image: t.imageUrl || t.image
+  }));
+
+  useEffect(() => {
     if (slug) {
-      const t = toolsData.find(x => x.slug === slug || x.id.toString() === slug);
+      const t = allTools.find(x => x.slug === slug || x.id.toString() === slug);
       if (t) {
         document.title = `${t.name} - Ainario Tools`;
         const metaDesc = document.querySelector('meta[name="description"]');
@@ -249,20 +277,20 @@ export function Tools() {
     } else {
       document.title = 'Tools - Ainario AI Agency';
     }
-  }, [slug]);
+  }, [slug, allTools]);
 
   const handleBack = () => {
     navigate('/tools');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const filteredTools = toolsData.filter(t => {
+  const filteredTools = allTools.filter(t => {
     const matchFilter = activeFilter === 'all' || t.category === activeFilter;
     const matchSearch = !searchQuery || 
-      t.name.toLowerCase().includes(searchQuery) || 
-      t.short.toLowerCase().includes(searchQuery) ||
-      t.categoryLabel.toLowerCase().includes(searchQuery) ||
-      t.stack.some(s => s.toLowerCase().includes(searchQuery));
+      (t.name || '').toLowerCase().includes(searchQuery) || 
+      (t.short || '').toLowerCase().includes(searchQuery) ||
+      (t.categoryLabel || '').toLowerCase().includes(searchQuery) ||
+      (t.stack || []).some((s: string) => s.toLowerCase().includes(searchQuery));
     return matchFilter && matchSearch;
   });
 
@@ -273,11 +301,11 @@ export function Tools() {
   });
 
   if (slug) {
-    const t = toolsData.find(x => x.slug === slug || x.id.toString() === slug);
+    const t = allTools.find(x => x.slug === slug || x.id.toString() === slug);
     if (!t) return null;
 
-    const related = toolsData.filter(x => x.id !== t.id && !x.comingSoon && x.category === t.category).slice(0, 3);
-    const allOther = toolsData.filter(x => x.id !== t.id && !x.comingSoon).slice(0, 3 - related.length);
+    const related = allTools.filter(x => x.id !== t.id && !x.comingSoon && x.category === t.category).slice(0, 3);
+    const allOther = allTools.filter(x => x.id !== t.id && !x.comingSoon).slice(0, 3 - related.length);
     const relatedAll = [...related, ...allOther].slice(0, 3);
 
     return (

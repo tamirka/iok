@@ -1,9 +1,43 @@
+import { useState, useEffect } from 'react';
 import { useParams, Navigate } from 'react-router-dom';
 import { toolsData } from './Tools';
+import { db } from '../firebase';
+import { collection, onSnapshot, query } from 'firebase/firestore';
 
 export function ToolViewer() {
   const { slug } = useParams();
-  const tool = toolsData.find(t => t.slug === slug || t.id.toString() === slug);
+  const [dbTools, setDbTools] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const q = query(collection(db, 'tools'));
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const tools = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+      setDbTools(tools);
+      setLoading(false);
+    });
+    return () => unsubscribe();
+  }, []);
+
+  if (loading) return <div style={{ paddingTop: '100px', textAlign: 'center' }}>Loading...</div>;
+
+  const allTools = [
+    ...dbTools,
+    ...toolsData.filter(staticT => !dbTools.some(dbT => 
+      (dbT.originalId && dbT.originalId.toString() === staticT.id.toString()) || 
+      (dbT.title && staticT.name && dbT.title.toLowerCase().trim() === staticT.name.toLowerCase().trim())
+    )).map(t => ({
+      ...t,
+      title: t.name,
+      imageUrl: t.image
+    }))
+  ].map(t => ({
+    ...t,
+    name: t.title || t.name,
+    image: t.imageUrl || t.image
+  }));
+
+  const tool = allTools.find(t => t.slug === slug || t.id.toString() === slug);
 
   if (!tool || !tool.iframeUrl) {
     return <Navigate to="/tools" />;
