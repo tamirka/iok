@@ -133,6 +133,136 @@ export const portfolioData = [
     link: "/portfolio-viewer/lobsuek-hostel",
     iframeUrl: "https://remix-lobsuek-hostel-635102282857.us-west1.run.app",
     image: "https://images.unsplash.com/photo-1555854877-bab0e564b8d5?auto=format&fit=crop&w=600&q=80"
+  },
+  {
+    id: 11,
+    name: "Sylvis Hostel Chiangmai",
+    slug: "sylvis-hostel-chiangmai",
+    category: "Hospitality",
+    categoryColor: "blue",
+    emoji: "🛏️",
+    short: "A vibrant and welcoming hostel in Chiangmai.",
+    stack: ["React", "Tailwind", "Vite"],
+    link: "/portfolio-viewer/sylvis-hostel-chiangmai",
+    iframeUrl: "https://sylvis-hostel-chiangmai.vercel.app/",
+    image: "https://images.unsplash.com/photo-1590490360182-c33d57733427?auto=format&fit=crop&w=600&q=80"
+  },
+  {
+    id: 12,
+    name: "Phuket Thailand Travel",
+    slug: "phuket-thailand-travel",
+    category: "Tourism",
+    categoryColor: "blue",
+    emoji: "🌴",
+    short: "Explore the best of Phuket with True Design.",
+    stack: ["React", "Tailwind", "Vite"],
+    link: "/portfolio-viewer/phuket-thailand-travel",
+    iframeUrl: "https://phuket-thailand-travel-x-true-desig.vercel.app/",
+    image: "https://images.unsplash.com/photo-1589394815804-964ce0ff9657?auto=format&fit=crop&w=600&q=80"
+  },
+  {
+    id: 13,
+    name: "PNT Phuket Roong Siam Pier",
+    slug: "pnt-phuket-roong-siam-pier",
+    category: "Tourism",
+    categoryColor: "blue",
+    emoji: "⛵",
+    short: "Premium pier and travel services in Phuket.",
+    stack: ["React", "Tailwind", "Vite"],
+    link: "/portfolio-viewer/pnt-phuket-roong-siam-pier",
+    iframeUrl: "https://pnt-phuket-roong-siam-pier.vercel.app/",
+    image: "https://images.unsplash.com/photo-1552465011-b4e21bf6e79a?auto=format&fit=crop&w=600&q=80"
+  },
+  {
+    id: 14,
+    name: "Phuket Chill Trips",
+    slug: "phuket-chill-trips",
+    category: "Tourism",
+    categoryColor: "blue",
+    emoji: "🏖️",
+    short: "Relaxing and chill trips around Phuket.",
+    stack: ["React", "Tailwind", "Vite"],
+    link: "/portfolio-viewer/phuket-chill-trips",
+    iframeUrl: "https://phuket-chill-trips.vercel.app/",
+    image: "https://images.unsplash.com/photo-1537956965359-7573183d1f57?auto=format&fit=crop&w=600&q=80"
+  },
+  {
+    id: 15,
+    name: "Prasert Phuket Travel",
+    slug: "prasert-phuket-travel",
+    category: "Tourism",
+    categoryColor: "blue",
+    emoji: "🗺️",
+    short: "Your trusted travel partner in Phuket.",
+    stack: ["React", "Tailwind", "Vite"],
+    link: "/portfolio-viewer/prasert-phuket-travel",
+    iframeUrl: "https://prasert-phuket-travel.vercel.app/",
+    image: "https://images.unsplash.com/photo-1589394815804-964ce0ff9657?auto=format&fit=crop&w=600&q=80"
+  },
+  {
+    id: 16,
+    name: "C.I.M Tour Phuket",
+    slug: "c-i-m-tour-phuket",
+    category: "Tourism",
+    categoryColor: "blue",
+    emoji: "🚤",
+    short: "Exciting tours and adventures in Phuket.",
+    stack: ["React", "Tailwind", "Vite"],
+    link: "/portfolio-viewer/c-i-m-tour-phuket",
+    iframeUrl: "https://c-i-m-tour-phuket.vercel.app/",
+    image: "https://images.unsplash.com/photo-1552465011-b4e21bf6e79a?auto=format&fit=crop&w=600&q=80"
+  },
+  {
+    id: 17,
+    name: "Phuket Best Tours",
+    slug: "phuket-best-tours",
+    category: "Tourism",
+    categoryColor: "blue",
+    emoji: "⭐",
+    short: "The best tour experiences in Phuket.",
+    stack: ["React", "Tailwind", "Vite"],
+    link: "/portfolio-viewer/phuket-best-tours",
+    iframeUrl: "https://phuket-best-tours.vercel.app/",
+    image: "https://images.unsplash.com/photo-1537956965359-7573183d1f57?auto=format&fit=crop&w=600&q=80"
+  },
+  {
+    id: 18,
+    name: "Phuket Best Tours Golden Key",
+    slug: "phuket-best-tours-golden-key",
+    category: "Tourism",
+    categoryColor: "blue",
+    emoji: "🔑",
+    short: "Exclusive Golden Key tours in Phuket.",
+    stack: ["React", "Tailwind", "Vite"],
+    link: "/portfolio-viewer/phuket-best-tours-golden-key",
+    iframeUrl: "https://phuket-best-tours-golden-key.vercel.app/",
+    image: "https://images.unsplash.com/photo-1589394815804-964ce0ff9657?auto=format&fit=crop&w=600&q=80"
+  },
+  {
+    id: 19,
+    name: "Coral Grand Divers Koh Tao",
+    slug: "coral-grand-divers-koh-tao",
+    category: "Tourism",
+    categoryColor: "blue",
+    emoji: "🤿",
+    short: "Premier diving experiences in Koh Tao.",
+    stack: ["React", "Tailwind", "Vite"],
+    link: "/portfolio-viewer/coral-grand-divers-koh-tao",
+    iframeUrl: "https://coral-grand-divers-koh-tao.vercel.app/",
+    image: "https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=600&q=80"
+  },
+  {
+    id: 20,
+    name: "Savanna Massage & Spa Krabi",
+    slug: "savanna-massage-spa-krabi",
+    category: "Wellness",
+    categoryColor: "green",
+    emoji: "💆",
+    short: "Relaxing massage and spa treatments in Krabi.",
+    stack: ["React", "Tailwind", "Vite"],
+    link: "/portfolio-viewer/savanna-massage-spa-krabi",
+    iframeUrl: "https://savanna-massage-spa-krabi.vercel.app/",
+    image: "https://images.unsplash.com/photo-1544161515-4ab6ce6db874?auto=format&fit=crop&w=600&q=80"
   }
 ];
 
@@ -146,7 +276,15 @@ export function Portfolio() {
   useEffect(() => {
     const q = query(collection(db, 'portfolio'), orderBy('createdAt', 'desc'));
     const unsubscribe = onSnapshot(q, (snapshot) => {
-      const portfolio = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+      const portfolio = snapshot.docs.map(d => {
+        const data = d.data();
+        const staticMatch = portfolioData.find(p => p.id.toString() === data.originalId);
+        return { 
+          id: d.id, 
+          image: data.imageUrl || (staticMatch ? staticMatch.image : ''),
+          ...data 
+        };
+      });
       setDbPortfolio(portfolio);
     });
     return () => unsubscribe();
@@ -169,7 +307,7 @@ export function Portfolio() {
     link: p.link || `/portfolio-viewer/${p.slug}`
   }));
 
-  const displayPortfolio = allPortfolio.filter(p => (p.category || '').toLowerCase() === 'hospitality').slice(0, 6);
+  const displayPortfolio = allPortfolio;
 
   const whatsappLink = "https://wa.me/66921818962?text=Hi,%20I'm%20interested%20in%20a%20website%20for%20my%20hostel";
 

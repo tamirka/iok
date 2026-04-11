@@ -237,7 +237,15 @@ export function Tools() {
   useEffect(() => {
     const q = query(collection(db, 'tools'), orderBy('createdAt', 'desc'));
     const unsubscribe = onSnapshot(q, (snapshot) => {
-      const tools = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+      const tools = snapshot.docs.map(d => {
+        const data = d.data();
+        const staticMatch = toolsData.find(t => t.id.toString() === data.originalId);
+        return { 
+          id: d.id, 
+          image: data.imageUrl || (staticMatch ? staticMatch.image : ''),
+          ...data 
+        };
+      });
       setDbTools(tools);
     });
     return () => unsubscribe();

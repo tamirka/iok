@@ -265,14 +265,12 @@ export function Admin() {
         await updateDoc(doc(db, activeTab, selectedItemId), dataToSave);
         setSuccess('Item updated successfully!');
       } else {
-        await addDoc(collection(db, activeTab), {
+        const docRef = await addDoc(collection(db, activeTab), {
           ...dataToSave,
           createdAt: serverTimestamp()
         });
         setSuccess('Item saved successfully!');
-        if (selectedItemId === 'new') {
-          setFormData(defaultForm);
-        }
+        setSelectedItemId(docRef.id);
       }
     } catch (err: any) {
       setError(err.message);

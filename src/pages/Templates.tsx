@@ -788,10 +788,12 @@ export function Templates() {
 
       const templates = snapshot.docs.map(doc => {
         const data = doc.data();
+        const staticMatch = templatesData.find(t => t.id.toString() === data.originalId);
         return {
           id: doc.id,
           name: data.title || data.name,
           slug: data.slug || slugify(data.title || data.name),
+          image: data.imageUrl || (staticMatch ? staticMatch.image : ''),
           ...data
         };
       });
